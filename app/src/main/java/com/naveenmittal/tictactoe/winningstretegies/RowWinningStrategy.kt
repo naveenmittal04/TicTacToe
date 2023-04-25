@@ -1,5 +1,6 @@
 package com.naveenmittal.tictactoe.winningstretegies
 
+import android.util.Log
 import com.naveenmittal.tictactoe.interfaces.WinningStrategy
 import com.naveenmittal.tictactoe.model.Board
 import com.naveenmittal.tictactoe.model.Move
@@ -19,6 +20,7 @@ class RowWinningStrategy: WinningStrategy {
             return true
         }
         m[move.player.getId()][row] = count + 1
+        Log.d("RowWinningStrategy", "isWinningMove: $m")
         return false
     }
 }

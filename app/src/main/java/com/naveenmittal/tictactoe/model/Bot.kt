@@ -4,9 +4,16 @@ import com.naveenmittal.tictactoe.interfaces.BotPlayingStrategy
 
 class Bot(
     id: Int,
-    private val level: DifficultyLevel,
+    private var level: DifficultyLevel,
     symbol: String
     ): Player(id, symbol, PlayerType.BOT) {
-        private val botPlayingStrategy: BotPlayingStrategy = BotPlayingStrategyFactory.getBotPlayingStrategy(level)
+    fun setDifficultyLevel(it: DifficultyLevel) {
+        level = it
+    }
 
+    private val botPlayingStrategy: BotPlayingStrategy = BotPlayingStrategyFactory.getBotPlayingStrategy(level)
+
+    override fun makeMove(board: Board): Move {
+        return botPlayingStrategy.makeMove(board, this)
+    }
 }

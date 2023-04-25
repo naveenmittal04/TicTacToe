@@ -43,6 +43,15 @@ class Game(
         }
     }
 
+    fun makeMove() {
+        if(currentPlayer.isBot()) {
+            val move = currentPlayer.makeMove(board)
+            makeMove(move.row, move.col)
+        } else {
+            throw Exception("Invalid move")
+        }
+    }
+
     fun getNextPlayer(): Player {
         val index = players.indexOf(currentPlayer)
         return players[(index + 1) % players.size]
@@ -71,13 +80,17 @@ class Game(
         if (gameState == GameState.DRAW) {
             return "Draw"
         } else if (gameState == GameState.SUCCESS) {
-            return winner.toString()
+            return winner?.getSymbol() ?: ""
         }
         return GameState.IN_PROGRESS.name
     }
 
     fun getCurrentPlayer(): Player {
         return currentPlayer
+    }
+
+    fun getBoard(): Board {
+        return board
     }
 
     class Builder{

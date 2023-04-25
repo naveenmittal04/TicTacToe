@@ -1,5 +1,6 @@
 package com.naveenmittal.tictactoe.winningstretegies
 
+import android.util.Log
 import com.naveenmittal.tictactoe.interfaces.WinningStrategy
 import com.naveenmittal.tictactoe.model.Board
 import com.naveenmittal.tictactoe.model.Move
@@ -15,10 +16,11 @@ class ColumnWinningStrategy: WinningStrategy {
         }
         val col = move.col
         val count = m[move.player.getId()][col] ?: 0;
-        if(count == board.size){
+        m[move.player.getId()][col] = count + 1
+        Log.d("ColumnWinningStrategy", "isWinningMove: $m")
+        if(count+1 == board.size){
             return true
         }
-        m[move.player.getId()][col] = count + 1
         return false
     }
 }

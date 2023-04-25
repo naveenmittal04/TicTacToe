@@ -12,4 +12,8 @@ class GameController() {
         game.makeMove(row, col)
     }
 
+    fun makeMove(game: Game) {
+        game.makeMove()
+    }
+
 }

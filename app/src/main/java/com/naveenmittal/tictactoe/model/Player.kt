@@ -37,6 +37,16 @@ open class Player(
         }
     }
 
+    fun isBot(): Boolean {
+        return playerType == PlayerType.BOT
+    }
+
+
+    open fun makeMove(board: Board): Move {
+        // Invalid move
+        throw Exception("Invalid move")
+    }
+
 //    fun makeMove(): Move {
 //        return Move(0, 0)
 //    }

@@ -39,4 +39,8 @@ class Board(val size: Int) {
             println()
         }
     }
+
+    fun getBoard(): List<List<Cell>> {
+        return board
+    }
 }
