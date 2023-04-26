@@ -23,4 +23,14 @@ class ColumnWinningStrategy: WinningStrategy {
         }
         return false
     }
+
+    override fun undoMove(move: Move) {
+        val col = move.col
+        val count = m[move.player.getId()][col] ?: 0;
+        m[move.player.getId()][col] = count - 1
+    }
+
+    override fun reset() {
+        m.clear()
+    }
 }

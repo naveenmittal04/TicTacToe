@@ -45,14 +45,13 @@ fun SelectFromList(
     else
         Icons.Filled.KeyboardArrowDown
 
-    Column(Modifier.padding(20.dp).wrapContentSize()) {
+    Column(Modifier.wrapContentSize()) {
         // Create an Outlined Text Field
         // with icon and not expanded
         OutlinedTextField(
             value = mSelectedText,
             onValueChange = {},
             modifier = Modifier
-                .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
                     // This value is used to assign to
                     // the DropDown the same width
