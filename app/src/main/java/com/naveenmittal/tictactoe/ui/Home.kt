@@ -209,8 +209,9 @@ fun PlayerRow(player: Player, i: Int, callback: (String) -> Unit, callback2: (St
 
 @Composable
 fun BotRow(player: Bot, i: Int, callback: (String) -> Unit, callback2: (DifficultyLevel) -> Unit) {
-    var symbol by remember { mutableStateOf("") }
+    var symbol by remember { mutableStateOf("O") }
     var difficultyLevel by remember { mutableStateOf(DifficultyLevel.EASY.name) }
+    val conext = LocalContext.current
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -218,15 +219,19 @@ fun BotRow(player: Bot, i: Int, callback: (String) -> Unit, callback2: (Difficul
             .wrapContentSize()
             .fillMaxWidth()
     ) {
-        Text("Player $i", Modifier.wrapContentSize())
+        Text("Bot Player $i", Modifier.wrapContentSize())
         TextField(value = symbol,
             onValueChange = {
                 symbol = it
                 callback(it)
             }, modifier = Modifier.wrapContentSize())
-        SelectFromList(default = difficultyLevel, label = "Select Difficulty Level", options = DifficultyLevel.values().map { it.name }, callback = {
+        SelectFromList(default = difficultyLevel, label = "Select Difficulty Level", options = listOf(DifficultyLevel.EASY.name), callback = {
+            if(it != DifficultyLevel.EASY.name){
+                Toast.makeText(conext, "Only Easy Level is Supported for now", Toast.LENGTH_SHORT).show()
+            } else {
             difficultyLevel = it
-            callback2(DifficultyLevel.valueOf(it))})
+            callback2(DifficultyLevel.valueOf(it))}
+            })
     }
 }
 
