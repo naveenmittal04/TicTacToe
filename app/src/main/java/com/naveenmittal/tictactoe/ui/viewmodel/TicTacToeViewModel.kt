@@ -9,6 +9,7 @@ import com.naveenmittal.tictactoe.model.GameState
 import com.naveenmittal.tictactoe.model.Move
 import com.naveenmittal.tictactoe.model.Player
 import com.naveenmittal.tictactoe.winningstretegies.ColumnWinningStrategy
+import com.naveenmittal.tictactoe.winningstretegies.CrossWinningStrategy
 import com.naveenmittal.tictactoe.winningstretegies.RowWinningStrategy
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -38,6 +39,7 @@ class TicTacToeViewModel : ViewModel()  {
                 .setPlayers(players)
                 .setWinningStrategy(ColumnWinningStrategy())
                 .setWinningStrategy(RowWinningStrategy())
+                .setWinningStrategy(CrossWinningStrategy())
                 .build()
             ticTacToeState.value = TicTacToeState.IN_PROGRESS
             currentPlayer.value = game!!.getCurrentPlayer()
