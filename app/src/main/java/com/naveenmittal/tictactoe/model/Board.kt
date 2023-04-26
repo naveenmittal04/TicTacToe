@@ -59,4 +59,8 @@ class Board(val size: Int) {
             throw InvalidMoveException()
         }
     }
+
+    fun reset() {
+        initializeBoard(size)
+    }
 }

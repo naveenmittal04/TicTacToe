@@ -29,4 +29,8 @@ class RowWinningStrategy: WinningStrategy {
         val count = m[move.player.getId()][row] ?: 0;
         m[move.player.getId()][row] = count - 1
     }
+
+    override fun reset() {
+        m.clear()
+    }
 }

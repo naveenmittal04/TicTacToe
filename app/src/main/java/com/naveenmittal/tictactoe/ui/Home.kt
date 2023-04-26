@@ -18,6 +18,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNodeLifecycleCallback
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +35,8 @@ import com.naveenmittal.tictactoe.model.Player
 import com.naveenmittal.tictactoe.model.PlayerType
 import com.naveenmittal.tictactoe.ui.viewmodel.TicTacToeState
 import com.naveenmittal.tictactoe.ui.viewmodel.TicTacToeViewModel
+import java.lang.Exception
+import java.time.Duration
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -51,22 +54,60 @@ fun Home(ticTacToeViewModel: TicTacToeViewModel) {
         TicTacToeState.STOP -> {
             StopScreen(ticTacToeViewModel)
         }
+
+        TicTacToeState.Replay -> {
+            ReplayScreen(ticTacToeViewModel)
+        }
+    }
+}
+
+@Composable
+fun ReplayScreen(ticTacToeViewModel: TicTacToeViewModel) {
+    val move_index = ticTacToeViewModel.getReplayIndex().collectAsState()
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(text = "Game Replay", fontSize = 50.sp)
+        PrintReplayBoard(ticTacToeViewModel, move_index)
+        Button(onClick = {
+            ticTacToeViewModel.nextMove()
+        }) {
+            Text("Next")
+        }
+        Button(onClick = {
+            ticTacToeViewModel.prevMove()
+        }) {
+            Text("Previous")
+        }
     }
 }
 
 @Composable
 fun StopScreen(ticTacToeViewModel: TicTacToeViewModel) {
-    Box(
-        contentAlignment = Alignment.Center
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
     ) {
         Text(text = ticTacToeViewModel.getWinner() ?: "", fontSize = 50.sp)
+        Button(onClick = {
+            ticTacToeViewModel.resetGame()
+        }) {
+            Text("Restart Game")
+        }
+        Button(onClick = {
+            ticTacToeViewModel.replay()
+        }) {
+            Text(text = "Replay of Current Game")
+        }
     }
 }
 
 @Composable
 fun InProgressScreen(ticTacToeViewModel: TicTacToeViewModel) {
-    var x by remember { mutableStateOf("") }
-    var y by remember { mutableStateOf("") }
+    val context = LocalContext.current
     val currentPlayer = ticTacToeViewModel.getCurrentPlayer().collectAsState()
     Column(
         verticalArrangement = Arrangement.Center,
@@ -76,23 +117,22 @@ fun InProgressScreen(ticTacToeViewModel: TicTacToeViewModel) {
         Text(text = "Current Player: ${currentPlayer.value?.getSymbol()}")
         PrintBoard(ticTacToeViewModel)
         if (currentPlayer.value?.isBot() == true) {
-            ticTacToeViewModel.makeMove(0, 0)
+            try {
+                ticTacToeViewModel.makeMove(0, 0)
+            } catch (e: Exception){
+                Toast.makeText(context, "Invalid Move", Toast.LENGTH_SHORT).show()
+            }
         }
         Button(onClick = {
-            ticTacToeViewModel.undoMove()
+            try {
+                ticTacToeViewModel.undoMove()
+            } catch (e: Exception){
+                Toast.makeText(context, "No moves to undo", Toast.LENGTH_SHORT).show()
+            }
+
         }) {
             Text("Undo Move")
         }
-//        else {
-//            TextField(value = x, onValueChange = {x = it}, label = {Text("Enter x")})
-//            TextField(value = y, onValueChange = {y = it}, label = {Text("Enter y")})
-//            Button(onClick = {
-//                ticTacToeViewModel.makeMove(x.toInt(), y.toInt())
-//            }) {
-//                Text("Make Move")
-//            }
-//        }
-
     }
 }
 
@@ -110,8 +150,8 @@ fun StartScreen(ticTacToeViewModel: TicTacToeViewModel) {
     ) {
         TextField(value = size, onValueChange = {size = it}, label = {Text("Enter size of board")})
         Button(onClick = {
-                if (size.toInt() < 3) {
-                    Toast.makeText(context, "Size should be greater than 2", Toast.LENGTH_SHORT).show()
+                if (size.toInt() < 3 || size.toInt() > 5) {
+                    Toast.makeText(context, "Size should be greater than 2 and less then 6", Toast.LENGTH_SHORT).show()
                 } else {
                     size_int = size.toInt()
                 }
@@ -145,6 +185,7 @@ fun StartScreen(ticTacToeViewModel: TicTacToeViewModel) {
 
 @Composable
 fun PlayerRow(player: Player, i: Int, callback: (String) -> Unit, callback2: (String) -> Unit) {
+    val context = LocalContext.current
     var symbol by remember { mutableStateOf(player.getSymbol()) }
     Column(
         verticalArrangement = Arrangement.Center,
@@ -156,8 +197,12 @@ fun PlayerRow(player: Player, i: Int, callback: (String) -> Unit, callback2: (St
         Text("Player $i", Modifier.wrapContentSize())
         TextField(value = symbol,
             onValueChange = {
-                symbol = it
-                callback(it)
+                if(it.length > 1) {
+                    Toast.makeText(context, "Symbol should be of length 1", Toast.LENGTH_SHORT).show()
+                } else {
+                    symbol = it
+                    callback(it)
+                }
                             }, modifier = Modifier.wrapContentSize())
     }
 }
@@ -187,6 +232,7 @@ fun BotRow(player: Bot, i: Int, callback: (String) -> Unit, callback2: (Difficul
 
 @Composable
 fun PrintBoard(ticTacToeViewModel: TicTacToeViewModel) {
+    val context = LocalContext.current
     val board = ticTacToeViewModel.getBoard().getBoard()
     Column(
         verticalArrangement = Arrangement.Center,
@@ -200,12 +246,48 @@ fun PrintBoard(ticTacToeViewModel: TicTacToeViewModel) {
             ) {
                 for (j in 0 until board.size) {
                     if(board[i][j].player == null){
-                        Button(onClick = { ticTacToeViewModel.makeMove(i, j) }, Modifier.padding(6.dp)) {
+                        Button(onClick = { try {
+                            ticTacToeViewModel.makeMove(i, j)
+                        } catch (e: Exception){
+                            Toast.makeText(context, "Invalid Move", Toast.LENGTH_SHORT).show()
+                        } }, Modifier.padding(6.dp)) {
                             Text(text = "-", fontSize = 30.sp)
                         }
                     } else {
                         board[i][j].player?.getSymbol()?.let {
                             Button(onClick = {  }, Modifier.padding(6.dp)) {
+                                Text(text = it, fontSize = 30.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PrintReplayBoard(ticTacToeViewModel: TicTacToeViewModel, move_index: State<Int>) {
+    val board = ticTacToeViewModel.getReplayBoard()?.getBoard()!!
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Move ${move_index.value}", fontSize = 30.sp)
+        for (i in board.indices) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                for (j in board.indices) {
+                    if (board[i][j].player == null) {
+                        Button(onClick = { }, Modifier.padding(6.dp)) {
+                            Text(text = "-", fontSize = 30.sp)
+                        }
+                    } else {
+                        board[i][j].player?.getSymbol()?.let {
+                            Button(onClick = { }, Modifier.padding(6.dp)) {
                                 Text(text = it, fontSize = 30.sp)
                             }
                         }

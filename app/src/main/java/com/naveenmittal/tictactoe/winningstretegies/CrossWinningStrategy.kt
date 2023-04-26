@@ -12,4 +12,7 @@ class CrossWinningStrategy: WinningStrategy {
     override fun undoMove(move: Move) {
         TODO("Not yet implemented")
     }
+
+    override fun reset() {
+    }
 }

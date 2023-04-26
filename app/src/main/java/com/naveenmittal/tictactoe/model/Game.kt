@@ -107,6 +107,24 @@ class Game(
         return board
     }
 
+    fun resetBoard() {
+        board.reset()
+    }
+
+    fun resetWinningStrategies() {
+        for (strategy in winningStrategies) {
+            strategy.reset()
+        }
+    }
+
+    fun getSize(): Int {
+        return size
+    }
+
+    fun getMoves(): MutableList<Move> {
+        return moves
+    }
+
     class Builder{
         private var size: Int = 0
         private var players: MutableList<Player> = mutableListOf<Player>()
