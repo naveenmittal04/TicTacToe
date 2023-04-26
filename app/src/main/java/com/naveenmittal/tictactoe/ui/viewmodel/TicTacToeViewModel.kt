@@ -84,4 +84,9 @@ class TicTacToeViewModel : ViewModel()  {
     fun getBoard(): Board {
         return game!!.getBoard()
     }
+
+    fun undoMove() {
+        game?.undoMove()
+        currentPlayer.value = game!!.getCurrentPlayer()
+    }
 }

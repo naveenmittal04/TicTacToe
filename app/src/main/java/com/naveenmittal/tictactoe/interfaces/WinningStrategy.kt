@@ -5,4 +5,6 @@ import com.naveenmittal.tictactoe.model.Move
 
 interface WinningStrategy {
     fun isWinningMove(board: Board, move: Move) : Boolean
+
+    fun undoMove(move: Move)
 }

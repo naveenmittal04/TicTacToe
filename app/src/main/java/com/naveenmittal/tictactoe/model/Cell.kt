@@ -8,7 +8,7 @@ class Cell {
         return cellState == CellState.EMPTY
     }
 
-    fun setCellPlayer(player: Player) {
+    fun setCellPlayer(player: Player?) {
         this.player = player
         cellState = CellState.OCCUPIED
     }

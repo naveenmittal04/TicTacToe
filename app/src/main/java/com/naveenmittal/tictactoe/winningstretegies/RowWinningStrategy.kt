@@ -16,11 +16,17 @@ class RowWinningStrategy: WinningStrategy {
         }
         val row = move.row
         val count = m[move.player.getId()][row] ?: 0;
-        if(count == board.size){
-            return true
-        }
         m[move.player.getId()][row] = count + 1
         Log.d("RowWinningStrategy", "isWinningMove: $m")
+        if(count+1 == board.size){
+            return true
+        }
         return false
+    }
+
+    override fun undoMove(move: Move) {
+        val row = move.row
+        val count = m[move.player.getId()][row] ?: 0;
+        m[move.player.getId()][row] = count - 1
     }
 }

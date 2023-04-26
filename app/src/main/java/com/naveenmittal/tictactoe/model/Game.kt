@@ -78,11 +78,25 @@ class Game(
 
     fun getWinner(): String {
         if (gameState == GameState.DRAW) {
-            return "Draw"
+            return "Game Draw"
         } else if (gameState == GameState.SUCCESS) {
-            return winner?.getSymbol() ?: ""
+            return ("Winner is " + winner?.getSymbol())
         }
         return GameState.IN_PROGRESS.name
+    }
+
+    fun undoMove() {
+        if (moves.size > 0) {
+            val move = moves.removeAt(moves.size - 1)
+            board.undoMove(move)
+            currentPlayer = move.player
+            for (strategy in winningStrategies) {
+                strategy.undoMove(move)
+            }
+            gameState = GameState.IN_PROGRESS
+        } else {
+            throw Exception("No moves to undo")
+        }
     }
 
     fun getCurrentPlayer(): Player {

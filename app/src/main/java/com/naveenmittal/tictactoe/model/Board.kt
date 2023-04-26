@@ -1,5 +1,7 @@
 package com.naveenmittal.tictactoe.model
 
+import com.naveenmittal.tictactoe.exceptions.InvalidMoveException
+
 class Board(val size: Int) {
     private val board: List<List<Cell>> = initializeBoard(size)
 
@@ -42,5 +44,19 @@ class Board(val size: Int) {
 
     fun getBoard(): List<List<Cell>> {
         return board
+    }
+
+    fun undoMove(move: Move) {
+        val row = move.row
+        val col = move.col
+        val player = move.player
+
+        val cell = board[row][col]
+        if (cell.player == player) {
+            cell.setCellPlayer(null)
+            cell.setCellState(CellState.EMPTY)
+        } else {
+            throw InvalidMoveException()
+        }
     }
 }

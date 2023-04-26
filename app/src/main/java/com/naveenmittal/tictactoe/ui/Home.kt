@@ -1,12 +1,14 @@
 package com.naveenmittal.tictactoe.ui
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
@@ -23,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.naveenmittal.tictactoe.model.Bot
@@ -75,6 +78,11 @@ fun InProgressScreen(ticTacToeViewModel: TicTacToeViewModel) {
         if (currentPlayer.value?.isBot() == true) {
             ticTacToeViewModel.makeMove(0, 0)
         }
+        Button(onClick = {
+            ticTacToeViewModel.undoMove()
+        }) {
+            Text("Undo Move")
+        }
 //        else {
 //            TextField(value = x, onValueChange = {x = it}, label = {Text("Enter x")})
 //            TextField(value = y, onValueChange = {y = it}, label = {Text("Enter y")})
@@ -90,7 +98,9 @@ fun InProgressScreen(ticTacToeViewModel: TicTacToeViewModel) {
 
 @Composable
 fun StartScreen(ticTacToeViewModel: TicTacToeViewModel) {
+    val context = LocalContext.current
     var size by remember { mutableStateOf("3") }
+    var size_int by remember { mutableStateOf(3) }
     var bot by remember { mutableStateOf(false) }
     val players = mutableListOf<Player>()
     Column(
@@ -99,24 +109,34 @@ fun StartScreen(ticTacToeViewModel: TicTacToeViewModel) {
         modifier = Modifier.fillMaxSize()
     ) {
         TextField(value = size, onValueChange = {size = it}, label = {Text("Enter size of board")})
+        Button(onClick = {
+                if (size.toInt() < 3) {
+                    Toast.makeText(context, "Size should be greater than 2", Toast.LENGTH_SHORT).show()
+                } else {
+                    size_int = size.toInt()
+                }
+            }
+        ){
+            Text("Set Size")
+        }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = "Play with bot")
             Switch(checked = bot, onCheckedChange = {bot = it} )
         }
-        if (bot){
-            val botPlayer = Bot(size.toInt()-2, DifficultyLevel.EASY, "O")
-            players.add(botPlayer)
-            BotRow(botPlayer,size.toInt()-2, {botPlayer.setSymbol(it)}, {botPlayer.setDifficultyLevel(it)})
-        }
-        for (i in 0 until size.toInt()-1 - if(bot) 1 else 0) {
+        for (i in 0 until size_int -1 - if(bot) 1 else 0) {
             val player = Player(i, "X", PlayerType.HUMAN)
             players.add(player)
             PlayerRow(player = player, i = i, {player.setSymbol(it)}, {player.setPlayerType(it)})
         }
+        if (bot){
+            val botPlayer = Bot(size_int-2, DifficultyLevel.EASY, "O")
+            players.add(botPlayer)
+            BotRow(botPlayer,size_int-2, {botPlayer.setSymbol(it)}, {botPlayer.setDifficultyLevel(it)})
+        }
         Button(onClick = {
-            ticTacToeViewModel.startGame(size.toInt(), players)
+            ticTacToeViewModel.startGame(size_int, players)
         }) {
             Text("Start")
         }
@@ -125,8 +145,7 @@ fun StartScreen(ticTacToeViewModel: TicTacToeViewModel) {
 
 @Composable
 fun PlayerRow(player: Player, i: Int, callback: (String) -> Unit, callback2: (String) -> Unit) {
-    var symbol by remember { mutableStateOf("") }
-    var playerType by remember { mutableStateOf("") }
+    var symbol by remember { mutableStateOf(player.getSymbol()) }
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -181,12 +200,12 @@ fun PrintBoard(ticTacToeViewModel: TicTacToeViewModel) {
             ) {
                 for (j in 0 until board.size) {
                     if(board[i][j].player == null){
-                        Button(onClick = { ticTacToeViewModel.makeMove(i, j) }) {
+                        Button(onClick = { ticTacToeViewModel.makeMove(i, j) }, Modifier.padding(6.dp)) {
                             Text(text = "-", fontSize = 30.sp)
                         }
                     } else {
                         board[i][j].player?.getSymbol()?.let {
-                            Button(onClick = {  }) {
+                            Button(onClick = {  }, Modifier.padding(6.dp)) {
                                 Text(text = it, fontSize = 30.sp)
                             }
                         }

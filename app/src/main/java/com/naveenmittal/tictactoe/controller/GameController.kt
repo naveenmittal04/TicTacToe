@@ -16,4 +16,8 @@ class GameController() {
         game.makeMove()
     }
 
+    fun undoMove(game: Game) {
+        game.undoMove()
+    }
+
 }

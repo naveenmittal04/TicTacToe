@@ -8,4 +8,8 @@ class CrossWinningStrategy: WinningStrategy {
     override fun isWinningMove(board: Board, move: Move): Boolean {
         return false
     }
+
+    override fun undoMove(move: Move) {
+        TODO("Not yet implemented")
+    }
 }
